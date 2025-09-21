@@ -7,7 +7,7 @@
 
 A full-stack web application where users can suggest, vote on, and discuss their favorite movies. Built with the MERN stack (MongoDB, Express, React, Node.js).
 
-**Live Deployment Link:** [**Your Live URL Will Go Here**](https://your-moviehub-frontend.onrender.com)
+**Live Deployment Link:** [**Your Live URL Will Go Here**](https://movie-chat-nj7a.onrender.com/)
 
 ---
 
@@ -100,7 +100,7 @@ erDiagram
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/moviehub-mern.git
+git clone https://github.com/Palshivam7071/moviehub-mern.git
 cd moviehub-mern
 ```
 
