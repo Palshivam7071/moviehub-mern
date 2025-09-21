@@ -1,0 +1,51 @@
+/* src/components/Comment/Comment.module.css */
+.comment {
+  background-color: var(--background-color);
+  padding: 0.75rem;
+  border-radius: 6px;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.author {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: var(--text-color-light);
+}
+
+.body {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.deleteButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-color-light);
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: none; /* Hidden by default */
+}
+
+.comment:hover .deleteButton {
+  display: block; /* Show on hover */
+}
+
+.deleteButton:hover {
+  color: var(--danger-color);
+  text-decoration: underline;
+}

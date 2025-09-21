@@ -20,7 +20,7 @@ const RegisterPage = () => {
     try {
       const response = await api.post("/auth/register", { name, email, password });
       login(response.data.user, response.data.token);
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       setError("Failed to register. Please check your details.");
     }

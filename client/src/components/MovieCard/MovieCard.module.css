@@ -73,6 +73,7 @@
 .footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.875rem;
   color: var(--text-color-light);
 }
@@ -99,4 +100,47 @@
 .deleteButton:hover {
   color: var(--danger-color);
   background-color: #fee2e2;
+}
+
+/* Styles for the new comment section */
+.footerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.commentToggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color-light);
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.commentToggle:hover {
+  background-color: var(--border-color);
+  color: var(--primary-color);
+}
+
+.commentsSection {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.commentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.noComments {
+  font-size: 0.875rem;
+  color: var(--text-color-light);
+  text-align: center;
+  padding: 1rem 0;
 }

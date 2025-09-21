@@ -11,13 +11,23 @@ const {
 const { protect, admin } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.get('/', getAllMovies);
-router.post('/', protect, suggestMovie);
-router.delete('/:id', protect, admin, deleteMovie);
+// Routes for movies
+router.route('/')
+  .get(getAllMovies)
+  .post(protect, suggestMovie);
 
-router.post('/:id/vote', protect, voteOnMovie);
-router.post('/:id/comments', protect, addComment);
+router.route('/:id')
+  .delete(protect, admin, deleteMovie);
 
-router.delete('/comments/:id', protect, admin, deleteComment);
+// Route for voting
+router.route('/:id/vote')
+  .post(protect, voteOnMovie);
+
+// Routes for comments
+router.route('/:id/comments')
+  .post(protect, addComment);
+  
+router.route('/comments/:id')
+  .delete(protect, deleteComment);
 
 module.exports = router;

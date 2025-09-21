@@ -1,4 +1,4 @@
-// src/controllers/movieController.js
+// server/src/controllers/movieController.js
 const Movie = require('../../models/movieModel');
 const Vote = require('../../models/voteModel');
 const Comment = require('../../models/commentModel');
@@ -6,36 +6,52 @@ const Comment = require('../../models/commentModel');
 // GET /api/movies
 exports.getAllMovies = async (req, res) => {
   try {
-    const movies = await Movie.aggregate([
-      {
-        $lookup: { // Join with votes collection
-          from: 'votes',
-          localField: '_id',
-          foreignField: 'movie',
-          as: 'votes'
-        }
-      },
-      {
-        $addFields: { // Calculate score
-          score: {
-            $subtract: [
-              { $size: { $filter: { input: '$votes', as: 'vote', cond: { $eq: ['$$vote.vote_type', 'UP'] } } } },
-              { $size: { $filter: { input: '$votes', as: 'vote', cond: { $eq: ['$$vote.vote_type', 'DOWN'] } } } }
-            ]
-          }
-        }
-      },
-      { $sort: { score: -1, createdAt: -1 } } // Sort by score, then by date
-    ]);
+    const movies = await Movie.find({})
+      .populate('user', 'name')
+      .populate({
+        path: 'comments',
+        options: { sort: { createdAt: -1 } },
+        populate: { path: 'user', select: 'name' }
+      })
+      .lean();
 
-    // Mongoose aggregation doesn't automatically populate, so we do it manually
-    await Movie.populate(movies, { path: 'user', select: 'name' });
+    const moviesWithScores = await Promise.all(
+      movies.map(async (movie) => {
+        const upvotes = await Vote.countDocuments({ movie: movie._id, vote_type: 'UP' });
+        const downvotes = await Vote.countDocuments({ movie: movie._id, vote_type: 'DOWN' });
+        return { ...movie, score: upvotes - downvotes };
+      })
+    );
 
-    res.json(movies);
+    moviesWithScores.sort((a, b) => b.score - a.score);
+    res.json(moviesWithScores);
   } catch (error) {
+    console.error('Error in getAllMovies:', error); // Log the actual error on the server
     res.status(500).json({ error: error.message });
   }
 };
+
+// POST /api/movies/:id/comments
+exports.addComment = async (req, res) => {
+    const { body } = req.body;
+    try {
+        const comment = await Comment.create({
+            body,
+            movie: req.params.id,
+            user: req.user.userId,
+        });
+
+        // **IMPORTANT FIX**: Link the comment back to the movie
+        await Movie.findByIdAndUpdate(req.params.id, { $push: { comments: comment._id } });
+
+        const populatedComment = await Comment.findById(comment._id).populate('user', 'name');
+        res.status(201).json(populatedComment);
+    } catch (error) {
+        res.status(400).json({ error: 'Could not add comment' });
+    }
+};
+
+// ... (The other functions are correct, but are included here for completeness) ...
 
 // POST /api/movies
 exports.suggestMovie = async (req, res) => {
@@ -50,7 +66,7 @@ exports.suggestMovie = async (req, res) => {
 
 // POST /api/movies/:id/vote
 exports.voteOnMovie = async (req, res) => {
-  const { voteType } = req.body; // 'UP' or 'DOWN'
+  const { voteType } = req.body;
   try {
     const existingVote = await Vote.findOne({ user: req.user.userId, movie: req.params.id });
     if (existingVote) {
@@ -71,13 +87,12 @@ exports.voteOnMovie = async (req, res) => {
   }
 };
 
-// ADMIN routes
+// DELETE /api/movies/:id
 exports.deleteMovie = async (req, res) => {
     try {
         const movie = await Movie.findById(req.params.id);
         if (!movie) return res.status(404).json({ error: 'Movie not found' });
         
-        // Also delete associated votes and comments
         await Vote.deleteMany({ movie: movie._id });
         await Comment.deleteMany({ movie: movie._id });
         await movie.deleteOne();
@@ -88,31 +103,22 @@ exports.deleteMovie = async (req, res) => {
     }
 };
 
-// (Comment controllers would follow a similar pattern)
-// POST /api/movies/:id/comments - Add a comment
-exports.addComment = async (req, res) => {
-    const movieId = parseInt(req.params.id);
-    const userId = req.user.userId;
-    const { body } = req.body;
-
-    try {
-        const comment = await prisma.comment.create({
-            data: { body, userId, movieId },
-            include: { user: { select: { name: true } } }
-        });
-        res.status(201).json(comment);
-    } catch (error) {
-        res.status(400).json({ error: 'Could not add comment' });
-    }
-};
-
-// DELETE /api/comments/:id - Delete a comment (Admin only)
+// DELETE /api/comments/:id
 exports.deleteComment = async (req, res) => {
-    const { id } = req.params;
     try {
-        await prisma.comment.delete({ where: { id: parseInt(id) } });
-        res.status(204).send();
+        const comment = await Comment.findById(req.params.id);
+        if (!comment) return res.status(404).json({ error: 'Comment not found' });
+
+        if (comment.user.toString() !== req.user.userId && req.user.role !== 'ADMIN') {
+            return res.status(403).json({ error: 'User not authorized' });
+        }
+        
+        // **IMPORTANT FIX**: Also remove the comment reference from the movie
+        await Movie.findByIdAndUpdate(comment.movie, { $pull: { comments: comment._id } });
+
+        await comment.deleteOne();
+        res.json({ message: 'Comment removed' });
     } catch (error) {
-        res.status(404).json({ error: 'Comment not found' });
+        res.status(500).json({ error: 'Server error' });
     }
 };

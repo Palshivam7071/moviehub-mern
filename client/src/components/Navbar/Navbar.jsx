@@ -26,8 +26,8 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className={styles.navLink}>Login</Link>
-              <Link to="/register" className={`${styles.navLink} ${styles.registerButton}`}>Register</Link>
+              <Link to="/login" className={`${styles.navLink} ${styles.registerButton}`}>Login</Link>
+              <Link to="/register" className={`${styles.navLink} ${styles.registerButton}`}>Get Started</Link>
             </>
           )}
         </nav>
