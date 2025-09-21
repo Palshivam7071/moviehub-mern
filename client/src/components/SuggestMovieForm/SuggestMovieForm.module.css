@@ -1,0 +1,12 @@
+.formContainer {
+  background-color: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.title {
+  margin-top: 0;
+  font-size: 1.25rem;
+}

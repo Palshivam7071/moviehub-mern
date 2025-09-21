@@ -1,0 +1,72 @@
+.navbar {
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  padding: 0; /* Container padding is handled globally */
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.welcomeMessage {
+  color: var(--text-color-light);
+}
+
+.navLink {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: var(--primary-color);
+}
+
+.navButton, .registerButton {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.navButton {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.navButton:hover {
+    background-color: #d1d5db;
+}
+
+.registerButton {
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+}
+
+.registerButton:hover {
+  background-color: var(--primary-color-light);
+}
